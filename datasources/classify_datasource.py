@@ -15,7 +15,7 @@ from pythainlp.corpus.common import thai_stopwords
 class Classification: 
   
   def __init__(self) -> None: 
-    self.loaded_model = pickle.load(open('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-ThaiScamLink/model/trained_model.sav', 'rb'))
+    self.loaded_model = pickle.load(open('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/model/trained_model.sav', 'rb'))
     self.emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"  # emoticons
         u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -84,7 +84,7 @@ class Classification:
   
   def check_fake_website_percentage(self, text, obj_stores):
     try:
-      df = pd.read_csv('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-ThaiScamLink/dataset/real_website_database.csv')
+      df = pd.read_csv('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/dataset/real_website_database.csv')
       sentences  = df['web_text'].tolist()
       model_name = "all-MiniLM-L6-v2"
       model = SentenceTransformer(model_name)

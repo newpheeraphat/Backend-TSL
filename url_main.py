@@ -45,7 +45,7 @@ def get_prediction_from_url(test_url):
 
     features_test = np.array(features_test).reshape((1, -1))
     
-    p = open('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-ThaiScamLink/model/trained_url_model.joblib', 'rb')
+    p = open('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/model/trained_url_model.joblib', 'rb')
     rf_model = load(p)
 
     proba = rf_model.predict_proba(features_test)
