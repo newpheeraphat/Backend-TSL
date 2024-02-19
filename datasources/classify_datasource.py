@@ -1,21 +1,22 @@
-import numpy as np
 import pickle
+import re
+
+import metadata_parser
+import numpy as np
 import pandas as pd
 import requests
-import re
-import metadata_parser
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
 from bs4 import BeautifulSoup
-from pythainlp.corpus.common import thai_stopwords
-from pythainlp.util import normalize
 from pythainlp import word_tokenize
 from pythainlp.corpus.common import thai_stopwords
+from pythainlp.util import normalize
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 class Classification: 
   
   def __init__(self) -> None: 
-    self.loaded_model = pickle.load(open('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/model/trained_model.sav', 'rb'))
+    self.loaded_model = pickle.load(open('/Users/user/Desktop/ThaiScamLinks/backend_ThaiScamLinks/Backend-TSL/model/trained_model.sav', 'rb'))
     self.emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"  # emoticons
         u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -84,10 +85,12 @@ class Classification:
   
   def check_fake_website_percentage(self, text, obj_stores):
     try:
-      df = pd.read_csv('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/dataset/real_website_database.csv')
+      df = pd.read_csv('/Users/user/Desktop/ThaiScamLinks/backend_ThaiScamLinks/Backend-TSL/dataset/real_website_database.csv')
       sentences  = df['web_text'].tolist()
       model_name = "all-MiniLM-L6-v2"
+      # print("running check_fake_website_percentage()")
       model = SentenceTransformer(model_name)
+      # print("DONE")
       sentence_vecs = model.encode(sentences)
       sentence_vecs_pred = model.encode(text)
       value = cosine_similarity([sentence_vecs_pred],sentence_vecs)
@@ -122,13 +125,19 @@ class Classification:
       obj = {}
       index = {0: 'normal', 1: 'gambling', 2: 'scam'}
       pred = df['cleaned_text'][0]
+      print(f'## {len(pred)}')
       all_text_pred = df['detail'][0]
       predictions, raw_outputs = self.loaded_model.predict(pred)
       probabilities = self.softmax(raw_outputs)
       
+      # print(f'## {list(df.columns)}')
+
+
       for idx, prob in enumerate(probabilities[0]):
           # print(f"Probability of class {idx}: {prob}")
           obj[index[idx]] = int(round(prob*100))
+      print("We are here!")
+      print(type(obj), type(all_text_pred)) 
           
       probabilities_fake_website = self.check_fake_website_percentage(all_text_pred, obj)
       return probabilities_fake_website
@@ -182,6 +191,7 @@ class Classification:
       obj['description'] = page.get_metadatas('description')
       obj['keyword'] = page.get_metadatas('keywords')
       obj['detail'] = self.get_all_text_from_url(url)
+      obj['status'] = True
       return obj
     except Exception as e:
       print(f"Failed to extract data from url: {e}")

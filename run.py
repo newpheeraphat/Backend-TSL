@@ -1,12 +1,15 @@
 import os.path
 import re
+
 import numpy as np
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-from utils.helpers import *
-from website_main import *
+
 from classify_main import *
 from url_main import *
+from utils.helpers import *
+from website_main import *
+from datasources.classify_datasource import Classification
 
 app = Flask(__name__)
 CORS(app) 
@@ -22,21 +25,22 @@ def predict():
     
     print(f"URL: {url}")
 
+    verify = Classification()
+    # Scraping
+    url = make_request(url)
+    text = verify.extract_data_from_url(url)
+
     if path == "verification":
       response_data = {
-        "classify": classify(url),
+        "classify": classify(text),
         "url_detection": get_prediction_from_url(url)
       }
-    # elif path == "moredetail":
-    #   response_data = {
-    #     "website_insight": run(url),
-    #   }
-    elif path == 'report': 
+    elif path == 'report':
       response_data = {
-        "test": "test"
+        "classify": classify(text),
+        "meta_website": text
       }
-
     return jsonify(response_data)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=False, port=8000)
