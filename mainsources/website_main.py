@@ -12,7 +12,6 @@ def run(raw_url):
     measurement = Measurement()
     
     country = website.get_country()
-    print(country)
     tld = website.get_tld()
     registar = website.get_domain_registration()
 
