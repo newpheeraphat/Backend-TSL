@@ -4,6 +4,8 @@ import pandas as pd
 import requests
 import re
 import metadata_parser
+import os
+
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from bs4 import BeautifulSoup
@@ -12,6 +14,7 @@ from pythainlp.util import normalize
 from pythainlp import word_tokenize
 from pythainlp.corpus.common import thai_stopwords
 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 class Classification: 
   
   def __init__(self) -> None: 
@@ -120,7 +123,7 @@ class Classification:
   def verify_website(self, df):
     try:
       obj = {}
-      index = {0: 'normal', 1: 'gambling', 2: 'scam'}
+      index = {0: 'other', 1: 'gambling', 2: 'scam'}
       pred = df['cleaned_text'][0]
       all_text_pred = df['detail'][0]
       predictions, raw_outputs = self.loaded_model.predict(pred)
