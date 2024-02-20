@@ -1,10 +1,8 @@
-from classify_main import *
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from mainsources.classify_main import *
 from mainsources.url_main import *
 from mainsources.website_main import *
-from url_main import *
 from utils.helpers import *
 
 app = Flask(__name__)
