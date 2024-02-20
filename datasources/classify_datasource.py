@@ -1,3 +1,4 @@
+import os
 import pickle
 import re
 
@@ -12,7 +13,7 @@ from pythainlp.util import normalize
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 class Classification: 
   
   def __init__(self) -> None: 
@@ -123,7 +124,7 @@ class Classification:
   def verify_website(self, df):
     try:
       obj = {}
-      index = {0: 'normal', 1: 'gambling', 2: 'scam'}
+      index = {0: 'other', 1: 'gambling', 2: 'scam'}
       pred = df['cleaned_text'][0]
       print(f'## {len(pred)}')
       all_text_pred = df['detail'][0]
@@ -178,12 +179,17 @@ class Classification:
   
   def extract_data_from_url(self, url):
     try:
+      response = requests.get(url)
+      
+      if response.status_code != 200:
+        return f"Failed to retrieve the webpage. Status code: {response.status_code}"
+
       if not url: 
           return {}
         
       if not (url.startswith("http://") or url.startswith("https://")):  # Check if the URL has the proper scheme
           raise ValueError("Please enter a valid URL starting with http:// or https://")
-        
+      
       obj = {}
       page = metadata_parser.MetadataParser(url)
       obj["url"] = url

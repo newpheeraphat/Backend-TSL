@@ -1,45 +1,43 @@
-import os.path
-import re
-
-import numpy as np
+from classify_main import *
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-
-from classify_main import *
+from mainsources.classify_main import *
+from mainsources.url_main import *
+from mainsources.website_main import *
 from url_main import *
 from utils.helpers import *
-from website_main import *
-from datasources.classify_datasource import Classification
 
 app = Flask(__name__)
 CORS(app) 
 
 @app.route('/', methods=['POST'])
-def predict():
+def redict():
     data = request.json
-    url = data['url']
+    raw_url = data['url']
     path = data['path']
     
-    if url == '': 
+    if raw_url == '':
       return ''
     
-    print(f"URL: {url}")
-
+    print(f"URL: {raw_url}")
+    
     verify = Classification()
-    # Scraping
-    url = make_request(url)
-    text = verify.extract_data_from_url(url)
+    url = make_request(raw_url) # Add HTTP
+    text = verify.extract_data_from_url(url) # Scraping Meta data and all text in the website
 
     if path == "verification":
       response_data = {
-        "classify": classify(text),
-        "url_detection": get_prediction_from_url(url)
+        "currentPercent": classify(text),
+        "urlDetection": get_prediction_from_url(url),
+        "isRisk": run(url)
       }
-    elif path == 'report':
+    elif path == "report": 
       response_data = {
         "classify": classify(text),
         "meta_website": text
       }
+  
+      
     return jsonify(response_data)
 
 if __name__ == '__main__':

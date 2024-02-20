@@ -1,14 +1,8 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 from urllib.parse import urlparse
 from googlesearch import search
 from urllib.parse import urlparse
-from tld import get_tld
 
-import pickle
-import os.path
 import re
-import numpy as np
 
 class Url:
   def __init__(self, url: str) -> None: 

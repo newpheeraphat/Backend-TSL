@@ -1,57 +1,40 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
+
 class Measurement: 
-  def is_ssl_valid(self, ssl_valid: str) -> bool: 
-    try:
-      return ssl_valid == "Valid"
+  def extract_data_from_url_selenium(self, url: str): 
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument("--disable-gpu") 
+    options.add_argument("--no-sandbox")  
+    options.add_argument("--disable-dev-shm-usage")  
+
+    driver = webdriver.Chrome(options=options)
+    driver.implicitly_wait(20)
+    try: 
+      driver.get(url)
+      html_content = driver.page_source
+      soup = BeautifulSoup(html_content, 'html.parser')
+      element = soup.find_all("span", class_="subtitle")
+      return element
     except Exception as e: 
-      print(f"Error occurred is_ssl_valid: {e}")
-      return False
-  
-  def is_risk_country(self, country: str) -> bool: 
+      print("Error Occurred: " + e)
+      return;
+    
+  def is_risk(self, val: str, url: str) -> bool: 
     try:
-      safe_country = ['US', 'UK']
-      if country in safe_country: 
-        return True 
-      return False
+      if (val == ""): raise Exception("Value is None")
+      
+      span_elements = self.extract_data_from_url_selenium(url)
+      risk_elements = [element.text for element in span_elements]
+      
+      return any(val.lower() in elements.lower() for elements in risk_elements)
     except Exception as e: 
       print(f"Error occurred is_risk_country: {e}")
-      return False
+      return True
+    
   
-  def is_whois_hidden(self, is_hidden: str) -> bool:
-    try:
-      if is_hidden == 'protected':
-        return True 
-      return False
-    except Exception as e: 
-      print(f"Error occurred is_whois_hidden: {e}")
-      return False
-  
-  def domain_age_seven_year(self, domain_age) -> bool: 
-    try:
-      return int(domain_age) > 7
-    except Exception as e: 
-      print(f"Error occurred domain_age_seven_year: {e}")
-      return False
-  
-  def check_tranco_rank(self, rank) -> bool: 
-    try: 
-      if int(rank) < 500000: 
-        return True 
-      return False
-    except Exception as e: 
-      print(f"Error occurred check_tranco_rank: {e}")
-      return False
-  
-  def is_paid_email(self, email) -> bool: 
-    try: 
-      free_email_domains = [
-            "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", 
-            "aol.com", "mail.com", "yandex.com", "protonmail.com"
-        ]
-      domain = email.split('@')[-1].lower()
-      return domain not in free_email_domains
-    except Exception as e: 
-      print(f"Error occurred is_paid_email: {e}")
-      return False
     
 
   
