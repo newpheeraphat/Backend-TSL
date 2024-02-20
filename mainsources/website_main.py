@@ -4,6 +4,10 @@ from utils.helpers import *
 
 import utils.constants as c
 
+def display_data(lstS): 
+  print(f"Country: {lstS[0]}")
+  print(f"Top Level Domain: {lstS[1]}")
+  print(f"Registrar: {lstS[2]}")
 
 
 def run(raw_url):

@@ -5,12 +5,13 @@ from bs4 import BeautifulSoup
 class Measurement: 
   def extract_data_from_url_selenium(self, url: str): 
     options = Options()
-    options.headless = True
+    options.add_argument('--headless')
     options.add_argument("--disable-gpu") 
     options.add_argument("--no-sandbox")  
     options.add_argument("--disable-dev-shm-usage")  
 
     driver = webdriver.Chrome(options=options)
+    driver.implicitly_wait(20)
     try: 
       driver.get(url)
       html_content = driver.page_source
