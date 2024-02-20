@@ -1,10 +1,9 @@
-import numpy as np
-from joblib import load
-from tld import get_tld
-
 from datasources.url_datasource import Url
+from tld import get_tld
+from joblib import load
 from utils.helpers import *
 
+import numpy as np
 
 def run_url(raw_url): 
   status = []
@@ -41,26 +40,13 @@ def run_url(raw_url):
 
   return status
 
-def load_model_in_batches(model_path, batch_size=100):
-    rf_model = None
-    with open(model_path, 'rb') as model_file:
-        for _ in range(batch_size):
-            chunk = model_file.read(1024 * 1024)  # 1 MB chunks (adjust as needed)
-            if not chunk:
-                break
-            if rf_model is None:
-                rf_model = load(chunk)
-            else:
-                rf_model = load(chunk, mmap_mode='r+')
-    return rf_model
-
 def get_prediction_from_url(test_url):
     features_test = run_url(test_url)
 
     features_test = np.array(features_test).reshape((1, -1))
-  
-    p = '/Users/user/Desktop/ThaiScamLinks/backend_ThaiScamLinks/Backend-TSL/model/trained_url_model.joblib'
-    rf_model = load_model_in_batches(p)
+    
+    p = open('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/model/trained_url_model.joblib', 'rb')
+    rf_model = load(p)
 
     proba = rf_model.predict_proba(features_test)
 

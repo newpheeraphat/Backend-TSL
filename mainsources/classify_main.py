@@ -1,7 +1,6 @@
 from datasources.classify_datasource import Classification
 from utils.helpers import *
 
-
 def classify(text):
   try: 
     classify = Classification()
