@@ -27,7 +27,8 @@ def redict():
       response_data = {
         "currentPercent": classify(text),
         "urlDetection": get_prediction_from_url(url),
-        "isRisk": run(url)
+        "isRisk": run(url),
+        "meta_website": text
       }
     elif path == "report": 
       response_data = {
