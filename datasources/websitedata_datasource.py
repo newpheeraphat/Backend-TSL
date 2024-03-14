@@ -1,5 +1,5 @@
 from utils.helpers import *
-
+import os
 import socket
 import tldextract
 import geoip2.database
@@ -17,7 +17,7 @@ class WebsiteData:
     
     def get_country(self): 
       try:
-        with geoip2.database.Reader('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/dataset/GeoLite2-Country.mmdb') as reader:
+        with geoip2.database.Reader('./dataset/GeoLite2-Country.mmdb') as reader:
           response = reader.country(self.get_ip_address())
           return response.country.name if response.country.name != None else ""
       except Exception as e: 

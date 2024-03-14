@@ -8,7 +8,7 @@ class Measurement:
     options.add_argument('--headless')
     options.add_argument("--disable-gpu") 
     options.add_argument("--no-sandbox")  
-    options.add_argument("--disable-dev-shm-usage")  
+    options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(20)
@@ -27,6 +27,9 @@ class Measurement:
       if (val == ""): raise Exception("Value is None")
       
       span_elements = self.extract_data_from_url_selenium(url)
+      
+      print(span_elements)
+      
       risk_elements = [element.text for element in span_elements]
       
       return any(val.lower() in elements.lower() for elements in risk_elements)
