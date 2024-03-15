@@ -1,17 +1,18 @@
 from datasources.classify_datasource import Classification
-from utils.helpers import *
 
-def classify(text):
+def classify(extracted_data):
   try: 
-    classify = Classification()
-    # url = make_request(raw_url)
-    # text = classify.extract_data_from_url(url)
-    df = classify.convert_to_dataframe(text)
-    verification = classify.verify_website(df)
-    
-    return verification
+    classifier = Classification()
+    df = classifier.convert_to_dataframe(extracted_data)
+    verification_result = classifier.verify_website(df)
+    return verification_result
   except Exception as e: 
-    print(f"Failed occurred: {e}")
-    return {}
+    print(f"Failed occurred from classify: {e}")
+    return {
+      "other": 0,
+      "gambling": 0,
+      "scam": 0,
+      "fake": 0
+    }
     
     

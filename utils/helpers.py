@@ -7,7 +7,7 @@ def remove_www(url: str) -> str:
         return url[4:]
     return url
 
-def preprocessing_url(url): 
+def get_domain_name(url): 
     if ("https://" in url) or ("http://" in url):
         parsed_url = urlparse(url)
         domain_name = parsed_url.netloc

@@ -1,42 +1,47 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from utils.helpers import *
 from mainsources.classify_main import *
 from mainsources.website_main import *
 from mainsources.url_main import *
 
+app = Flask(__name__)
+CORS(app) 
 
-def redict():
+def predict(url: str):
     data = {
-      'url': "https://www.google.com",
-      'path': "verification"
+      "url": url,
+      "path": "verification"
     }
-    raw_url = data['url']
-    path = data['path']
+    raw_url = data.get('url', '')  # use .get for safer retrieval of dict keys
+    action = data.get('path', '')
     
-    if raw_url == '':
-      return ''
+    if not raw_url:  
+        return jsonify({"error": "URL is required."}), 400
     
-    print(f"URL: {raw_url}")
+    print(f"Processing URL: {raw_url}")
     
-    verify = Classification()
-    url = make_request(raw_url)
-    text = verify.extract_data_from_url(url) 
+    verifier = Classification() 
+    
+    try:
+        response_url = make_request(raw_url)
+        extracted_data = verifier.extract_data_from_url(response_url)
+    except Exception as e:  
+        return jsonify({"error": str(e)}), 500  
 
-    if path == "verification":
+    if action == "verification":
       response_data = {
-        "currentPercent": classify(text),
-        "urlDetection": get_prediction_from_url(url),
-        "isRisk": run(url),
-        "meta_website": text
+        "currentPercent": classify(extracted_data),
+        "urlDetection": get_prediction_from_url(response_url),
+        "isRisk": run(response_url),
+        "meta_website": extracted_data
       }
-    elif path == "report": 
-      response_data = {
-        "classify": classify(text),
-        "meta_website": text
-      }
+    elif action == "report": 
+      response_data = { "classify": classify(response_url), "meta_website": extracted_data }
+    else:
+      return jsonify({"error": "Invalid path specified."}), 400
   
-      
-    return jsonify(response_data)
+    print(response_data)
 
 if __name__ == '__main__':
-    redict()
+    predict("https://www.facebook.com/")
