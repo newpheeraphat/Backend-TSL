@@ -40,8 +40,6 @@ def predict():
       response_data = { "classify": classify(response_url), "meta_website": extracted_data }
     else:
       return jsonify({"error": "Invalid path specified."}), 400
-  
-    print(response_data) 
     return jsonify(response_data)
 
 if __name__ == '__main__':
