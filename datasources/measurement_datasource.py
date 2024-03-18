@@ -1,39 +1,71 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
+import re
 
-class Measurement: 
-  def extract_data_from_url_selenium(self, url: str): 
-    options = Options()
-    options.add_argument('--headless')
-    options.add_argument("--disable-gpu") 
-    options.add_argument("--no-sandbox")  
-    options.add_argument("--disable-dev-shm-usage")  
+class RiskAssessment: 
+  def __init__(self) -> None:
+    self.risk_countries = [
+      "United States",
+      "China",
+      "Russia",
+      "Germany",
+      "Netherlands",
+      "Hong Kong",
+      "Singapore",
+      "United Kingdom",
+      "France",
+      "Bulgaria"
+      ]
+    self.risk_tlds = [".ml", ".gq", ".tk", ".cf", ".su", ".cn", ".do", ".pw", ".cc", ".ng"]
+    self.risk_registrars = [
+      "Backorder Ltd", 
+      "Harmon Web Global Service", 
+      "HoganHost LTD", 
+      "FE-SU",
+      "FE-RU",
+      "URL Solutions",
+      "Nets To Limited",
+      "Domainhosting.com.ng",
+      "DDD TECHNOLOGY PTE. LTD",
+      "Aceville Pte. Ltd."
+      ]
+  
+  def is_valid_value(self, val) -> bool:
+    """Check if the value is non-empty and not None."""
+    return val not in (None, "")
 
-    driver = webdriver.Chrome(options=options)
-    driver.implicitly_wait(20)
-    try: 
-      driver.get(url)
-      html_content = driver.page_source
-      soup = BeautifulSoup(html_content, 'html.parser')
-      element = soup.find_all("span", class_="subtitle")
-      return element
-    except Exception as e: 
-      print("Error Occurred: " + e)
-      return;
-    
-  def is_risk(self, val: str, url: str) -> bool: 
+  def clean_string(self, s: str) -> str:
+    """Lowercase the string, strip whitespace, and remove non-alphabetic characters."""
+    return re.sub(r'[^a-z\s]', '', s.lower().strip())
+
+  def is_risk_measurement(self, val: str, risk_list: list) -> bool:
+    """Generalized method to check if a cleaned value is present in any of the cleaned risk list elements."""
+    if not self.is_valid_value(val):
+        raise ValueError("Provided value is invalid")
+    cleaned_val = self.clean_string(val)
+    return any(cleaned_val in self.clean_string(element) for element in risk_list)
+
+  def is_risk_country_measurement(self, val: str) -> bool:
     try:
-      if (val == ""): raise Exception("Value is None")
-      
-      span_elements = self.extract_data_from_url_selenium(url)
-      risk_elements = [element.text for element in span_elements]
-      
-      return any(val.lower() in elements.lower() for elements in risk_elements)
-    except Exception as e: 
-      print(f"Error occurred is_risk_country: {e}")
-      return True
-    
+        return self.is_risk_measurement(val, self.risk_countries)
+    except ValueError as e:
+        print(f"Error occurred: {e}")
+        return False 
+
+  def is_risk_tld_measurement(self, val: str) -> bool:
+      try:
+        return self.is_risk_measurement(val, self.risk_tlds)
+      except ValueError as e:
+        print(f"Error occurred: {e}")
+        return False
+
+  def is_risk_registrar_measurement(self, val: str) -> bool:
+      try:
+        return self.is_risk_measurement(val, self.risk_registrars)
+      except ValueError as e:
+        print(f"Error occurred: {e}")
+        return False
   
     
 

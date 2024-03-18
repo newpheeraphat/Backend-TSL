@@ -19,7 +19,8 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 class Classification: 
   
   def __init__(self) -> None: 
-    self.loaded_model = pickle.load(open('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/model/trained_model.sav', 'rb'))
+    self.loaded_model = pickle.load(open('./model/trained_model.sav', 'rb'))
+    self.real_website_database_path = './dataset/real_website_database.csv'
     self.emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"  # emoticons
         u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -88,7 +89,7 @@ class Classification:
   
   def check_fake_website_percentage(self, text, obj_stores):
     try:
-      df = pd.read_csv('/Users/pheeraphatprisan/Desktop/Sourcetree/Backend-TSL/dataset/real_website_database.csv')
+      df = pd.read_csv(self.real_website_database_path)
       sentences  = df['web_text'].tolist()
       model_name = "all-MiniLM-L6-v2"
       model = SentenceTransformer(model_name)
@@ -127,18 +128,17 @@ class Classification:
       index = {0: 'other', 1: 'gambling', 2: 'scam'}
       pred = df['cleaned_text'][0]
       all_text_pred = df['detail'][0]
-      predictions, raw_outputs = self.loaded_model.predict(pred)
+      prediction, raw_outputs = self.loaded_model.predict(pred)
       probabilities = self.softmax(raw_outputs)
       
       for idx, prob in enumerate(probabilities[0]):
-          # print(f"Probability of class {idx}: {prob}")
           obj[index[idx]] = int(round(prob*100))
           
       probabilities_fake_website = self.check_fake_website_percentage(all_text_pred, obj)
       return probabilities_fake_website
     except Exception as e: 
       print(f"Failed to veryfy the website: {e}")
-      return None
+      return { "other": 0, "gambling": 0, "scam": 0, "fake": 0 }
   
   def preprocess_clean_text(self, text):
     try:
@@ -156,17 +156,17 @@ class Classification:
       text = [word for word in text.split() if word.lower() not in self.thai_stopwords]
       return text
     except Exception as e:
-        print(f"Failed to preprocess clean text: {e}")
-        return None
+      print(f"Failed to preprocess clean text: {e}")
+      return None
 
   def get_all_text_from_url(self, url):
     try:
       response = requests.get(url)
       if response.status_code == 200:
-          soup = BeautifulSoup(response.content, 'html.parser')
-          return ' '.join(soup.get_text().split())
+        soup = BeautifulSoup(response.content, 'html.parser')
+        return ' '.join(soup.get_text().split())
       else:
-          return f"Failed to retrieve the webpage. Status code: {response.status_code}"
+        return f"Failed to retrieve the webpage. Status code: {response.status_code}"
     except Exception as e: 
       print(f"Failed to retrieve the webpage: {e}")
       return None
@@ -174,14 +174,10 @@ class Classification:
   def extract_data_from_url(self, url):
     try:
       response = requests.get(url)
-      
-      if response.status_code != 200:
-        return f"Failed to retrieve the webpage. Status code: {response.status_code}"
 
-      if not url: 
-          return {}
+      if not url or response.status_code != 200: raise Exception("Failed to retrieve the webpage")
         
-      if not (url.startswith("http://") or url.startswith("https://")):  # Check if the URL has the proper scheme
+      if not (url.startswith("http://") or url.startswith("https://")): 
           raise ValueError("Please enter a valid URL starting with http:// or https://")
       
       obj = {}
@@ -194,21 +190,27 @@ class Classification:
       return obj
     except Exception as e:
       print(f"Failed to extract data from url: {e}")
-      return None
+      return {
+        "url": "",
+        "title": "",
+        "description": "",
+        "keyword": "",
+        "detail": ""
+      }
   
   def convert_to_dataframe(self, obj):
     try:
-        df = pd.DataFrame(obj)
-        expected_columns = ['url', 'title', 'description', 'keyword', 'detail']
-        df = df[expected_columns]
-        df = df.fillna('')
-        df['original'] = df['title'] + ' ' + df['description'] + ' ' + df['keyword'] + ' ' + df['detail']
-        df['clean'] = df['original'].apply(lambda x: self.preprocess_clean_text(x))
-        df['cleaned_text'] = df['clean'].apply(lambda x: " ".join(x))
-        return df
+      df = pd.DataFrame(obj)
+      expected_columns = ['url', 'title', 'description', 'keyword', 'detail']
+      df = df[expected_columns]
+      df = df.fillna('')
+      df['original'] = df['title'] + ' ' + df['description'] + ' ' + df['keyword'] + ' ' + df['detail']
+      df['clean'] = df['original'].apply(lambda x: self.preprocess_clean_text(x))
+      df['cleaned_text'] = df['clean'].apply(lambda x: " ".join(x))
+      return df
     except Exception as e:
-        print(f"Fail to convert to dataframe: {e}")
-        return None  
-  
+      print(f"Fail to convert to dataframe: {e}")
+      return None  
+
 
   
