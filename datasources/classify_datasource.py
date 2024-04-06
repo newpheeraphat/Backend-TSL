@@ -14,13 +14,16 @@ from pythainlp.corpus.common import thai_stopwords
 from pythainlp.util import normalize
 from pythainlp import word_tokenize
 from pythainlp.corpus.common import thai_stopwords
+from database.database import PostgreSQL
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 class Classification: 
   
   def __init__(self) -> None: 
     self.loaded_model = pickle.load(open('./model/trained_model.sav', 'rb'))
-    self.real_website_database_path = './dataset/real_website_database.csv'
+    self.conn = PostgreSQL()
+    # self.real_website_database_path = './dataset/real_website_database.csv'
     self.emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"  # emoticons
         u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -89,8 +92,10 @@ class Classification:
   
   def check_fake_website_percentage(self, text, obj_stores):
     try:
-      df = pd.read_csv(self.real_website_database_path)
-      sentences  = df['web_text'].tolist()
+      df = self.conn.retrieve_data()
+      extracted_data = [dict(row) for row in df]
+      new_df = pd.DataFrame(extracted_data)
+      sentences = new_df['WhitelistText'].tolist()
       model_name = "all-MiniLM-L6-v2"
       model = SentenceTransformer(model_name)
       sentence_vecs = model.encode(sentences)
@@ -99,7 +104,7 @@ class Classification:
       
       max_similarity_index = np.argmax(value)  
       max_similarity_value = value[0, max_similarity_index] 
-      most_similar_sentence_url = df['web_url'][max_similarity_index]
+      most_similar_sentence_url = new_df['WhitelistURL'][max_similarity_index]
       fake_website_percentage = int(float(max_similarity_value) * 100)
       
       if fake_website_percentage > 90:
@@ -111,7 +116,10 @@ class Classification:
           return obj_stores
     except Exception as e: 
       print(f"Failed to scan file in real website database: {e}")
-      return None
+      obj_stores['fake'] = 0
+      return  obj_stores
+    finally:
+      self.conn.close_connection()
 
   def softmax(self, logits):
     try:

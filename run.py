@@ -37,10 +37,12 @@ def predict():
         "meta_website": extracted_data
       }
     elif action == "report": 
-      response_data = { "classify": classify(response_url), "meta_website": extracted_data }
+      response_data = { "classify": classify(extracted_data), "meta_website": extracted_data }
     else:
       return jsonify({"error": "Invalid path specified."}), 400
+
+    print(response_data)  
     return jsonify(response_data)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(host="0.0.0.0", debug=False, port=8000)
