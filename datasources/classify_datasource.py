@@ -90,10 +90,8 @@ class Classification:
     self.thai_stopwords.append("")
     self.thai_stopwords.append(" ")
   
-  def check_fake_website_percentage(self, text, obj_stores):
+  def check_fake_website_percentage(self, text, obj_stores, extracted_data):
     try:
-      df = self.conn.retrieve_data()
-      extracted_data = [dict(row) for row in df]
       new_df = pd.DataFrame(extracted_data)
       sentences = new_df['WhitelistText'].tolist()
       model_name = "all-MiniLM-L6-v2"
@@ -118,8 +116,6 @@ class Classification:
       print(f"Failed to scan file in real website database: {e}")
       obj_stores['fake'] = 0
       return  obj_stores
-    finally:
-      self.conn.close_connection()
 
   def softmax(self, logits):
     try:
@@ -130,7 +126,7 @@ class Classification:
       print(f"Failed occurred when calculate softmax probability: {e}")
       return None
 
-  def verify_website(self, df):
+  def verify_website(self, df, whitelist_database_data):
     try:
       obj = {}
       index = {0: 'other', 1: 'gambling', 2: 'scam'}
@@ -142,7 +138,7 @@ class Classification:
       for idx, prob in enumerate(probabilities[0]):
           obj[index[idx]] = int(round(prob*100))
           
-      probabilities_fake_website = self.check_fake_website_percentage(all_text_pred, obj)
+      probabilities_fake_website = self.check_fake_website_percentage(all_text_pred, obj, whitelist_database_data)
       return probabilities_fake_website
     except Exception as e: 
       print(f"Failed to veryfy the website: {e}")
