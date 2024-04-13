@@ -5,6 +5,7 @@ import requests
 import re
 import metadata_parser
 import os
+import torch
 
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
@@ -21,6 +22,8 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 class Classification: 
   
   def __init__(self) -> None: 
+    print("Helloo")
+    # self.loaded_model = torch.load('./model/trained_model.sav', map_location=lambda storage, loc: storage)
     self.loaded_model = pickle.load(open('./model/trained_model.sav', 'rb'))
     self.conn = PostgreSQL()
     # self.real_website_database_path = './dataset/real_website_database.csv'
