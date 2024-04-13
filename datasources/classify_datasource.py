@@ -5,7 +5,7 @@ import requests
 import re
 import metadata_parser
 import os
-import torch
+from transformers import CamembertForSequenceClassification, CamembertTokenizerFast
 
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
@@ -22,9 +22,10 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 class Classification: 
   
   def __init__(self) -> None: 
-    print("Helloo")
-    # self.loaded_model = torch.load('./model/trained_model.sav', map_location=lambda storage, loc: storage)
-    self.loaded_model = pickle.load(open('./model/trained_model.sav', 'rb'))
+    self.model_path = "./model/best-model-wangchanberta"
+    self.model = CamembertForSequenceClassification.from_pretrained(self.model_path)
+    self.tokenizer= CamembertTokenizerFast.from_pretrained(self.model_path)
+    # self.loaded_model = pickle.load(open('./model/trained_model.pkl', 'rb'))
     self.conn = PostgreSQL()
     # self.real_website_database_path = './dataset/real_website_database.csv'
     self.emoji_pattern = re.compile("["
@@ -92,6 +93,27 @@ class Classification:
     self.thai_stopwords.append("_")
     self.thai_stopwords.append("")
     self.thai_stopwords.append(" ")
+    
+  def predict(self, text):
+    # Tokenize the input text
+    inputs = self.tokenizer(text, padding=True, truncation=True, max_length=512, return_tensors="pt").to('cpu')
+
+    # Get model output (assuming outputs logits)
+    outputs = self.model(**inputs)
+
+    # Calculate probabilities from logits
+    logits = outputs.logits
+    probs = logits.softmax(dim=1)
+
+    # Get the index of the maximum probability
+    pred_label_idx = probs.argmax(dim=1)
+
+    # Convert predicted label index to label name
+    # Ensure your model config or some dictionary maps indices to label names
+    pred_label = self.model.config.id2label[pred_label_idx.item()]
+
+    return probs, pred_label_idx, pred_label
+
   
   def check_fake_website_percentage(self, text, obj_stores, extracted_data):
     try:
@@ -133,13 +155,19 @@ class Classification:
     try:
       obj = {}
       index = {0: 'other', 1: 'gambling', 2: 'scam'}
-      pred = df['cleaned_text'][0]
+      pred = df['cleaned_text'][0][:512]
       all_text_pred = df['detail'][0]
-      prediction, raw_outputs = self.loaded_model.predict(pred)
-      probabilities = self.softmax(raw_outputs)
       
-      for idx, prob in enumerate(probabilities[0]):
-          obj[index[idx]] = int(round(prob*100))
+      # //////////////////////////////////////////
+      probs, pred_label_idx, pred_label = self.predict(pred)
+      class_probabilities = probs.squeeze().tolist()  # Convert from tensor to list for easier manipulation
+      print(f"The output is {pred_label_idx}" + pred_label)
+      for idx, prob in enumerate(class_probabilities):
+        # label = self.model.config.id2label[idx]
+        obj[index[idx]] = int(round(prob*100))
+        # print(f"Probability of {label} : {prob * 100:.2f}%")
+      # //////////////////////////////////////////
+      
           
       probabilities_fake_website = self.check_fake_website_percentage(all_text_pred, obj, whitelist_database_data)
       return probabilities_fake_website
