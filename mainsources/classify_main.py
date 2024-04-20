@@ -24,6 +24,17 @@ def classify(extracted_data, url):
       }
 
     verification_result = classifier.verify_website(df, whitelist_database_data)
+    
+    print(verification_result['fake'])
+    
+    if verification_result['fake'] > 90:
+      return {
+        "other": 0,
+        "gambling": 0,
+        "scam": 0,
+        "fake": verification_result['fake']
+      }
+    
     return verification_result
   except Exception as e: 
     print(f"Failed occurred from classify: {e}")
