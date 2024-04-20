@@ -1,0 +1,17 @@
+numpy
+pandas
+Flask
+python-whois
+flask_cors
+requests
+metadata_parser
+sentence_transformers
+joblib
+pythainlp
+beautifulsoup4
+selenium
+googlesearch-python
+tldextract
+geoip2
+tld
+simpletransformers

@@ -23,26 +23,25 @@ def predict():
     
     try:
         response_url = make_request(raw_url)
+        response_url = redirect_to_homepage(response_url)
         extracted_data = verifier.extract_data_from_url(response_url)
     except Exception as e:  
-        return jsonify({"error": str(e)}), 500  
-
-    response_data = { "meta_website": extracted_data }
+        return jsonify({"error": str(e)}), 500 
 
     if action == "verification":
       response_data = {
-        "currentPercent": classify(extracted_data),
+        "currentPercent": classify(extracted_data, response_url),
         "urlDetection": get_prediction_from_url(response_url),
         "isRisk": run(response_url),
         "meta_website": extracted_data
       }
     elif action == "report": 
-      response_data = { "classify": classify(response_url), "meta_website": extracted_data }
+      response_data = { "classify": classify(extracted_data, response_url), "meta_website": extracted_data }
     else:
       return jsonify({"error": "Invalid path specified."}), 400
-  
-    print(response_data) 
+
+    print(response_data)  
     return jsonify(response_data)
 
 if __name__ == '__main__':
-    app.run(debug=False, port=8000)
+    app.run(host="0.0.0.0", debug=False, port=8000)

@@ -2,7 +2,6 @@ from datasources.url_datasource import Url
 from tld import get_tld
 from joblib import load
 from utils.helpers import *
-import requests
 import numpy as np
 
 try:
@@ -37,13 +36,10 @@ def get_prediction_from_url(test_url):
         return {"maliciousUrlPercent": 0}
 
     try:
-        response = requests.get(test_url)
-        response.raise_for_status() 
+        features_test = np.array(run_url(test_url)).reshape(1, -1)
+        proba = rf_model.predict_proba(features_test)
+        malicious_proba = proba[0][1] * 100
+        return {"maliciousUrlPercent": int(malicious_proba)}
     except Exception as e:
         print(f"Failed to retrieve the webpage: {e}")
         return {"maliciousUrlPercent": 0}
-
-    features_test = np.array(run_url(test_url)).reshape(1, -1)
-    proba = rf_model.predict_proba(features_test)
-    malicious_proba = proba[0][1] * 100
-    return {"maliciousUrlPercent": int(malicious_proba)}
