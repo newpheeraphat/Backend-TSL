@@ -1,11 +1,12 @@
 from datasources.url_datasource import Url
 from tld import get_tld
 from joblib import load
-from utils.helpers import *
 import numpy as np
 
+from utils.helpers import preprocessing_url_detection
+
 try:
-    with open('./model/trained_url_model.joblib', 'rb') as model_file:
+    with open('C:/Users/user\Desktop/ThaiScamLinks/Old_backend_ThaiScamLinks/Backend-TSL/model/trained_url_model.joblib', 'rb') as model_file:
         rf_model = load(model_file)
 except Exception as e:
     print(f"Error loading model: {e}")

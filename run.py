@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from mainsources.classify_main import *
-from mainsources.url_main import *
-from mainsources.website_main import *
-from utils.helpers import *
+from datasources.classify_datasource import Classification
+from mainsources.classify_main import classify
+from mainsources.url_main import get_prediction_from_url
+from utils.helpers import make_request, redirect_to_homepage
+from mainsources.website_main import run
+
 
 app = Flask(__name__)
 CORS(app) 

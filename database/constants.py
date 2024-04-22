@@ -1,6 +1,7 @@
 hostname = 'localhost'
 # database = "ThaiCheckLink"
-database = "ThaiScamLinksLastest"
+# database = "ThaiScamLinksLastest"
+database = "ThaiScamLinksDB"
 username = "postgres"
-pwd = "new024124712"
-port_id = 5432
+pwd = "pear2545"
+port_id = 5433
