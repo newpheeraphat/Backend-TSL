@@ -106,7 +106,19 @@ Download two models with the provided link and move them to the model folder:
 
 </a>
 
-### 4. Run the Development Server
+### 4. Connect to PostgreSQL
+
+Enter your PostgreSQL config in `/database/constants.py`
+
+```sh
+  hostname = HOST_NAME
+  database = DATABASE_NAME
+  username = USER_NAME
+  pwd = PASSWORD
+  port_id = PORT
+```
+
+### 5. Run the Development Server
 
 After installing the dependencies, you can start the development server by running:
 
