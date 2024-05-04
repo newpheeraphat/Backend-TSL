@@ -9,7 +9,6 @@ sentence_transformers
 joblib
 pythainlp
 beautifulsoup4
-selenium
 googlesearch-python
 tldextract
 geoip2
