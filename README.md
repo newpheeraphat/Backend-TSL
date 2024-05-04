@@ -98,14 +98,10 @@ Navigate to the project directory and install the required dependencies:
 ### 3. Download Model
 
 Download two models with the provided link and move them to the model folder:
-<a href="https://drive.google.com/drive/u/2/folders/1ic9WeUad_XWXnQQDoE-ZJiT7pa3eTC1J"
-
->
-
+<a href="https://drive.google.com/drive/u/2/folders/1ic9WeUad_XWXnQQDoE-ZJiT7pa3eTC1J">
 ```sh
   https://drive.google.com/drive/u/2/folders/1ic9WeUad_XWXnQQDoE-ZJiT7pa3eTC1J
 ```
-
 </a>
 
 ### 4. Run the Development Server
