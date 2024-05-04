@@ -137,7 +137,7 @@ This command starts the Flask application in development mode, error reporting, 
 We welcome contributions to ThaiCheckLinks Backend for Machine Learning! Here's how you can get involved:
 
 1. Fork the Project
-2. Clone the forked repository to your local machine using Git.
+2. Clone the forked repository to your local machine using Git
 
 ```sh
   git clone https://github.com/newpheeraphat/Backend-TSL.git
@@ -150,13 +150,13 @@ We welcome contributions to ThaiCheckLinks Backend for Machine Learning! Here's 
 ```
 
 4. Work on the project, implement new features, fix bugs, or improve documentation.
-5. Once you're happy with your changes, commit them to your branch.
+5. Once you're happy with your changes, commit them to your branch
 
 ```sh
   git commit -am "Add new feature: XYZ"
 ```
 
-6. Push your changes to your forked repository on GitHub.
+6. Push your changes to your forked repository on GitHub
 
 ```sh
   git push origin feature/new-feature
