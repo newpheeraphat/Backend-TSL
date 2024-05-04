@@ -9,7 +9,7 @@
   <h3 align="center">ThaiCheckLinks Backend For Machine Learning</h3>
 
   <p align="center">
-    The development of a backend system designed specifically for verifying the links within Thai language content using machine learning techniques
+    The development of a backend system designed specifically for verifying the links within Thai language content using machine learning techniques.
     <br />
     <a href="https://studentmahidolac-my.sharepoint.com/:w:/g/personal/apichaya_mae_student_mahidol_ac_th/EdLLgWGkPC5IvlW-lZ8QrtEBZuOILnYg4S9sLmyJsU_n_w?rtime=uV6lsCBs3Eg"><strong>Explore the docs »</strong></a>
     <br />
@@ -108,7 +108,7 @@ Download two models with the provided link and move them to the model folder:
 
 ### 4. Connect to PostgreSQL
 
-Enter your PostgreSQL config in `/database/constants.py`
+Enter your PostgreSQL config in `/database/constants.py`:
 
 ```sh
   hostname = HOST_NAME
@@ -136,14 +136,14 @@ This command starts the Flask application in development mode, error reporting, 
 
 We welcome contributions to ThaiCheckLinks Backend for Machine Learning! Here's how you can get involved:
 
-1. Fork the Project
-2. Clone the forked repository to your local machine using Git
+1. Fork the Project.
+2. Clone the forked repository to your local machine using Git.
 
 ```sh
   git clone https://github.com/newpheeraphat/Backend-TSL.git
 ```
 
-3. Create a new branch for your contributions
+3. Create a new branch for your contributions.
 
 ```sh
   git checkout -b feature/new-feature
@@ -156,7 +156,7 @@ We welcome contributions to ThaiCheckLinks Backend for Machine Learning! Here's 
   git commit -am "Add new feature: XYZ"
 ```
 
-6. Push your changes to your forked repository on GitHub
+6. Push your changes to your forked repository on GitHub.
 
 ```sh
   git push origin feature/new-feature
