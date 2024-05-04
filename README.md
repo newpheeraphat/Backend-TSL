@@ -90,7 +90,7 @@ cd Backend-TSL
 Navigate to the project directory and install the required dependencies:
 
 ```sh
-  pip install -r requirements.txt
+  pip3 install -r requirements.txt
 ```
 
 ### 3. Run the Development Server
