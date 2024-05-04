@@ -4,12 +4,8 @@ from utils.helpers import *
 
 import utils.constants as c
 
-def display_website_insight(website_insights):
-  print(f"Country: {website_insights[0]}")
-  print(f"Top Level Domain: {website_insights[1]}")
-  print(f"Registrar: {website_insights[2]}")
-
 def run(raw_url: str):
+  try:
     url = get_domain_name(raw_url)
     website = WebsiteData(url)
     measurement = RiskAssessment()
@@ -17,17 +13,6 @@ def run(raw_url: str):
     country = website.get_country()
     tld = website.get_tld()
     registrar = website.get_domain_registration()
-    display_website_insight([country, tld, registrar])
-    
-
-    # TODO: Waiting for Spamhaus API
-    # response_data = {
-    #   'measurement': {
-    #     "is_risk_country": measurement.is_risk(country, c.RISK_COUNTRIES_URL),
-    #     "is_risk_tld": measurement.is_risk(tld, c.TOP_LEVEL_DOMAINS_URL),
-    #     "is_risk_registrar": measurement.is_risk(registar, c.REGISTRAR_URL)
-    #   }
-    # }
   
     
     response_data = {
@@ -38,4 +23,13 @@ def run(raw_url: str):
       }
     }
     
-    return response_data;
+    return response_data
+  except Exception as e: 
+    print("Error Occurred with Website Detail" + e)
+    return {
+      'measurement': {
+        "is_risk_country": False,
+        "is_risk_tld": False,
+        "is_risk_registrar": False
+      }
+    }

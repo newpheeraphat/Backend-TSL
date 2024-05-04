@@ -1,25 +1,32 @@
 import requests
 import metadata_parser
-from urllib.parse import urlparse
-
-def remove_www(url: str) -> str:
-    if url[0:3] == "www":
-        return url[4:]
-    return url
+from urllib.parse import urlparse, urlunparse
 
 def get_domain_name(url): 
     if ("https://" in url) or ("http://" in url):
         parsed_url = urlparse(url)
         domain_name = parsed_url.netloc
+        if domain_name.startswith("www."):
+            domain_name = domain_name[4:]
         return domain_name
-    elif url[0:3] == "www":
+    elif url.startswith("www."):
         return url[4:]
     else:
         return url
 
+def redirect_to_homepage(url):
+    parsed_url = urlparse(url)
+    homepage_url = urlunparse((parsed_url.scheme, parsed_url.netloc, '', '', '', ''))
+    has_homepage = requests.get(homepage_url)
+
+    if has_homepage:
+        return homepage_url
+    return url
+
+
 def make_request(url):
     if not url.startswith(('http://', 'https://')):
-        url = 'http://' + url  # Default to HTTP if no scheme is provided
+        url = 'http://' + url  
     try:
         return url
     except requests.ConnectionError:

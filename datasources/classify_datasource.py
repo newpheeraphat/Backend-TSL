@@ -5,6 +5,7 @@ import requests
 import re
 import metadata_parser
 import os
+from transformers import CamembertForSequenceClassification, CamembertTokenizerFast
 
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
@@ -21,9 +22,10 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 class Classification: 
   
   def __init__(self) -> None: 
-    self.loaded_model = pickle.load(open('./model/trained_model.sav', 'rb'))
+    self.model_path = "./model/best-model-wangchanberta"
+    self.model = CamembertForSequenceClassification.from_pretrained(self.model_path)
+    self.tokenizer= CamembertTokenizerFast.from_pretrained(self.model_path)
     self.conn = PostgreSQL()
-    # self.real_website_database_path = './dataset/real_website_database.csv'
     self.emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"  # emoticons
         u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -89,11 +91,24 @@ class Classification:
     self.thai_stopwords.append("_")
     self.thai_stopwords.append("")
     self.thai_stopwords.append(" ")
+    
+  def predict(self, text):
+    inputs = self.tokenizer(text, padding=True, truncation=True, max_length=512, return_tensors="pt").to('cpu')
+
+    outputs = self.model(**inputs)
+
+    logits = outputs.logits
+    probs = logits.softmax(dim=1)
+
+    pred_label_idx = probs.argmax(dim=1)
+
+    pred_label = self.model.config.id2label[pred_label_idx.item()]
+
+    return probs, pred_label_idx, pred_label
+
   
-  def check_fake_website_percentage(self, text, obj_stores):
+  def check_fake_website_percentage(self, text, obj_stores, extracted_data):
     try:
-      df = self.conn.retrieve_data()
-      extracted_data = [dict(row) for row in df]
       new_df = pd.DataFrame(extracted_data)
       sentences = new_df['WhitelistText'].tolist()
       model_name = "all-MiniLM-L6-v2"
@@ -118,8 +133,6 @@ class Classification:
       print(f"Failed to scan file in real website database: {e}")
       obj_stores['fake'] = 0
       return  obj_stores
-    finally:
-      self.conn.close_connection()
 
   def softmax(self, logits):
     try:
@@ -130,19 +143,21 @@ class Classification:
       print(f"Failed occurred when calculate softmax probability: {e}")
       return None
 
-  def verify_website(self, df):
+  def verify_website(self, df, whitelist_database_data):
     try:
       obj = {}
       index = {0: 'other', 1: 'gambling', 2: 'scam'}
-      pred = df['cleaned_text'][0]
+      pred = df['cleaned_text'][0][:512]
       all_text_pred = df['detail'][0]
-      prediction, raw_outputs = self.loaded_model.predict(pred)
-      probabilities = self.softmax(raw_outputs)
       
-      for idx, prob in enumerate(probabilities[0]):
-          obj[index[idx]] = int(round(prob*100))
+      probs, pred_label_idx, pred_label = self.predict(pred)
+      class_probabilities = probs.squeeze().tolist() 
+      print(f"The output is {pred_label_idx}" + pred_label)
+      for idx, prob in enumerate(class_probabilities):
+        obj[index[idx]] = int(round(prob*100))
+      
           
-      probabilities_fake_website = self.check_fake_website_percentage(all_text_pred, obj)
+      probabilities_fake_website = self.check_fake_website_percentage(all_text_pred, obj, whitelist_database_data)
       return probabilities_fake_website
     except Exception as e: 
       print(f"Failed to veryfy the website: {e}")
