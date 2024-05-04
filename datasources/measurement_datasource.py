@@ -32,15 +32,12 @@ class RiskAssessment:
       ]
   
   def is_valid_value(self, val) -> bool:
-    """Check if the value is non-empty and not None."""
     return val not in (None, "")
 
   def clean_string(self, s: str) -> str:
-    """Lowercase the string, strip whitespace, and remove non-alphabetic characters."""
     return re.sub(r'[^a-z\s]', '', s.lower().strip())
 
   def is_risk_measurement(self, val: str, risk_list: list) -> bool:
-    """Generalized method to check if a cleaned value is present in any of the cleaned risk list elements."""
     if not self.is_valid_value(val):
         raise ValueError("Provided value is invalid")
     cleaned_val = self.clean_string(val)

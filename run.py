@@ -11,7 +11,7 @@ CORS(app)
 @app.route('/', methods=['POST'])
 def predict():
     data = request.json
-    raw_url = data.get('url', '')  # use .get for safer retrieval of dict keys
+    raw_url = data.get('url', '')
     action = data.get('path', '')
     
     if not raw_url:  
@@ -39,8 +39,7 @@ def predict():
       response_data = { "classify": classify(extracted_data, response_url), "meta_website": extracted_data }
     else:
       return jsonify({"error": "Invalid path specified."}), 400
-
-    print(response_data)  
+      
     return jsonify(response_data)
 
 if __name__ == '__main__':

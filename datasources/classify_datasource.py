@@ -25,9 +25,7 @@ class Classification:
     self.model_path = "./model/best-model-wangchanberta"
     self.model = CamembertForSequenceClassification.from_pretrained(self.model_path)
     self.tokenizer= CamembertTokenizerFast.from_pretrained(self.model_path)
-    # self.loaded_model = pickle.load(open('./model/trained_model.pkl', 'rb'))
     self.conn = PostgreSQL()
-    # self.real_website_database_path = './dataset/real_website_database.csv'
     self.emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"  # emoticons
         u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -95,21 +93,15 @@ class Classification:
     self.thai_stopwords.append(" ")
     
   def predict(self, text):
-    # Tokenize the input text
     inputs = self.tokenizer(text, padding=True, truncation=True, max_length=512, return_tensors="pt").to('cpu')
 
-    # Get model output (assuming outputs logits)
     outputs = self.model(**inputs)
 
-    # Calculate probabilities from logits
     logits = outputs.logits
     probs = logits.softmax(dim=1)
 
-    # Get the index of the maximum probability
     pred_label_idx = probs.argmax(dim=1)
 
-    # Convert predicted label index to label name
-    # Ensure your model config or some dictionary maps indices to label names
     pred_label = self.model.config.id2label[pred_label_idx.item()]
 
     return probs, pred_label_idx, pred_label
@@ -158,15 +150,11 @@ class Classification:
       pred = df['cleaned_text'][0][:512]
       all_text_pred = df['detail'][0]
       
-      # //////////////////////////////////////////
       probs, pred_label_idx, pred_label = self.predict(pred)
-      class_probabilities = probs.squeeze().tolist()  # Convert from tensor to list for easier manipulation
+      class_probabilities = probs.squeeze().tolist() 
       print(f"The output is {pred_label_idx}" + pred_label)
       for idx, prob in enumerate(class_probabilities):
-        # label = self.model.config.id2label[idx]
         obj[index[idx]] = int(round(prob*100))
-        # print(f"Probability of {label} : {prob * 100:.2f}%")
-      # //////////////////////////////////////////
       
           
       probabilities_fake_website = self.check_fake_website_percentage(all_text_pred, obj, whitelist_database_data)

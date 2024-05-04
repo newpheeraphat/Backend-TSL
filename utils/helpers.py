@@ -26,7 +26,7 @@ def redirect_to_homepage(url):
 
 def make_request(url):
     if not url.startswith(('http://', 'https://')):
-        url = 'http://' + url  # Default to HTTP if no scheme is provided
+        url = 'http://' + url  
     try:
         return url
     except requests.ConnectionError:

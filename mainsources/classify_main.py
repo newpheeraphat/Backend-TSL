@@ -25,7 +25,6 @@ def classify(extracted_data, url):
 
     verification_result = classifier.verify_website(df, whitelist_database_data)
     
-    print(verification_result['fake'])
     
     if verification_result['fake'] > 90:
       return {
