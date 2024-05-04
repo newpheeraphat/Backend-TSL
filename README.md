@@ -70,9 +70,11 @@ To get a local copy up and running follow these simple example steps.
 This guide will help you get started with running your Flask application locally on your machine. Make sure you have Python installed (version 3.11.7 or later).
 
 - download
+  <a href="https://www.python.org/downloads/">
   ```sh
   https://www.python.org/downloads/
   ```
+  </a>
 
 ### Installation
 
@@ -93,7 +95,20 @@ Navigate to the project directory and install the required dependencies:
   pip3 install -r requirements.txt
 ```
 
-### 3. Run the Development Server
+### 3. Download Model
+
+Download two models with the provided link and move them to the model folder:
+<a href="https://drive.google.com/drive/u/2/folders/1ic9WeUad_XWXnQQDoE-ZJiT7pa3eTC1J"
+
+>
+
+```sh
+  https://drive.google.com/drive/u/2/folders/1ic9WeUad_XWXnQQDoE-ZJiT7pa3eTC1J
+```
+
+</a>
+
+### 4. Run the Development Server
 
 After installing the dependencies, you can start the development server by running:
 
